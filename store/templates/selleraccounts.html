@@ -1,0 +1,64 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+
+
+<div class="container col-lg-4">
+    <div class="p-4 m-4 border rounded py-2">
+        <h3 class="alert alert-light border rounded">Create A Seller Account</h3>
+        <form action = "/selleraccounts" method="POST">
+            {% csrf_token %}
+            {% if error %}
+            <div class="alert alert-danger" role = "alert">
+                {{error}}
+            </div>
+            {% endif %}
+            <!--Firm Name-->
+            <div class="form-group form-group-sm">
+                <label for="">Firm Name</label>
+                <input required type="firmname" name="firmname" value="{{svalues.firmname}}" id="" class="form-control" placeholder="">
+            </div>
+
+            <!--First Name-->
+            <div class="form-group form-group-sm">
+                <label for="">First Name</label>
+                <input required type="fname" name="fname" value="{{svalues.fname}}" id="" class="form-control" placeholder="">
+            </div>
+            
+            <!--Last Name-->
+            <div class="form-group form-group-sm">
+                <label for="">Last Name</label>
+                <input type="lname" name="lname" value="{{svalues.lname}}" id="" class="form-control" placeholder="">
+            </div>
+
+            <!--Phone Number-->
+            <div class="form-group form-group-sm">
+                <label for="">Phone No.</label>
+                <input required type="phone" name="phone" value="{{svalues.phone}}" id="" class="form-control" placeholder="">
+            </div>
+
+            <!--Email-->
+            <div class="form-group form-group-sm">
+              <label for="">E-mail</label>
+              <input required type="email" name="email" value="{{svalues.email}}" id="" class="form-control" placeholder="abc@def.com">
+            </div>
+            <!--Password-->
+            <div class="form-group form-group-sm">
+                <label for="">Password</label>
+                <input required type="password" name="password" id="" class="form-control" placeholder="********************************">
+            </div>
+            <!--Button-->
+            <div class="container-fluid">
+                <div class="from-group form-group-sm">
+                    <input type="submit" class="btn btn-info" value="Create Account">
+                    <div class="btn border">
+                        <a class="nav-link" href="/sellerlogin" style = "color : black;">Login Instead</a>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>    
+</div>
+
+{% endblock %}

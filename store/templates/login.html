@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container col-lg-4">
+    <div class="p-4 m-4 border rounded py-2">
+        <h3 class="alert alert-light border rounded">Login</h3>
+        <form action = "/login" method="POST">
+            {% csrf_token %}
+            {% if error %}
+            <div class="alert alert-danger" role = "alert">
+                {{error}}
+            </div>
+            {% endif %}
+            
+            <!--Email-->
+            <div class="form-group form-group-sm">
+              <label for="">E-mail</label>
+              <input required type="email" name="email" value="{{values.email}}" id="" class="form-control" placeholder="abc@def.com">
+            </div>
+            <!--Password-->
+            <div class="form-group form-group-sm">
+                <label for="">Password</label>
+                <input required type="password" name="password" id="" class="form-control" placeholder="********************************">
+            </div>
+            <!--Button-->
+            <div class="container-fluid">
+                <div class="from-group form-group-sm">
+                    <input type="submit" class="btn btn-info" value="Login">
+                    <div class="btn border">
+                        <a class="nav-link" style="padding: 0.5px;" href="/accounts" style = "color : black;">Create New Account</a>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>    
+</div>
+
+{% endblock %}

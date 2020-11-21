@@ -1,0 +1,48 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+
+
+<!-- Body -->
+
+<h2 class="ml-5">Best market for hardware, electronics and equipements!</h2><br>
+<p class="ml-5">Has the lockdown impated the footfall on your shop?<br>Sell here!</p><br>
+
+<!-- Product List -->
+<div class="container-fluid mt-3">
+  <div class="container">
+    <div class="border rounded p-4 m-4">
+        <p class="display-4">Your Product List</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sno.</th>
+                    <th>Time</th>
+                    <th></th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Qt.</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for p in productlist %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{p.date}}</td>
+                    <td><img class="" style = "width: 120px" src="{{p.image.url}}"></td>
+                    <td>{{p.name}}</td>
+                    <td>{{p.price}}</td>
+                    <td>{{p.quantity}}</td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+</div>
+
+{% endblock %}

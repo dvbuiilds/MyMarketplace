@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load cart %}
+
+{% load custom_filter %}
+<div class="container">
+    <div class="border rounded p-4 m-4">
+        <div class="container-fluid my-auto">
+            <div class="row">
+                <div class="col-md-9">
+                    <p class="display-4">Your Shopping Cart</p>
+                </div>
+                <div class="col-md-3 my-auto">
+                    <a href="" data-toggle="modal" data-target="#wallet" class = "btn btn-light btn-outline-info border rounded">Wallet</a>
+                </div>
+            </div>
+            
+            {% if request.session.cart_price|multiply1 > request.session.balance %}
+            <div class="alert alert-danger" role = "alert">
+                Please add more amount to your wallet.
+            </div>
+            {% endif %}
+            
+            {% if error or request.session.balance <= request.session.cart_price %}
+            <div class="alert alert-danger" role = "alert">
+                {{error}}
+            </div>
+            {% endif %}
+            {% if request.session.adv_pay %}
+            <div class="alert alert-success" role="alert">
+                You have already made advanced payment.
+            </div>
+            {% endif %}
+            <br>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sno.</th>
+                    <th></th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Qt.</th>
+                    <th>Sub-Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                {% for product in products %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td class = "pl-3"><img class="mx-auto" style = "width:120px; display: flex; align-items: center; justify-content: center;" src="{{product.image.url}}">
+                        <div class="card-footer p-0 mx-auto">
+
+                            {% if product|is_in_cart:request.session.cart %}
+                            <div class="row no-gutters">
+                              <form action="" method="POST" class="col-2">
+                                {% csrf_token %}
+                                <input hidden type = "text" name = 'product' value = '{{product.id}}'>
+                                <input hidden type = "text" name = 'remove' value = 'True'>
+                                <input type = "submit" value=" - " class = "btn btn-block btn-light">
+                              </form>
+                              <div class="text-center col my-auto">{{product|cart_qt:request.session.cart}} in cart</div>
+                              <form action="" method="POST" class="col-2">
+                                {% csrf_token %}
+                                <input hidden type = "text" name = 'product' value = '{{product.id}}'>
+                                <input type = "submit" value=" + " class = "btn btn-block btn-light">
+                              </form>
+                              
+                            </div>
+              
+                            {% else %}
+                            <form action = "/#{{product.id}}" method = "POST">
+                              {% csrf_token %}
+                              <input hidden type = "text" name = 'product' value = '{{product.id}}'>
+                              <input type = "submit" class="btn btn-light border btn-sm" style="background-color:#48a7f5; color: white; text-align:center" value = "Move To Cart">
+                            </form>
+                            {% endif %}
+                          </div>
+                    </td>
+                    
+                    
+                    <td>{{product.name}}</td>
+                    <td>{{product.price|currency}}</td>
+                    <td>{{product|cart_qt:request.session.cart}}</td>
+                    <td>{{product|price_total:request.session.cart|currency}}</td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="text-center"colspan="4">Grand Total</th>
+                    <th class="text-right">{{products|total_cart_price:request.session.cart|currency}}</th>
+                </tr>
+            </tfoot>
+        </table>
+        <hr>
+        <div class="m-2 p-3">
+            <a href="" data-toggle="modal" data-target="#exampleModal" class = "btn btn-light btn-outline-info border rounded col-lg-2 float-right">Check Out</a>
+        </div>
+
+        <!-- Recommended Products -->
+        <br>
+        <hr>
+        <br>
+        <br>
+        <!--all products-->
+        {% if recommended %}
+        <div class="container-fluid my-2">
+            <h2>Recommended Products</h2>
+        </div>
+
+        <div id="products" class=" mx-auto container" style=" text-align:center">
+            <div class="row mx-auto">
+                
+                {% for product in recommended%}
+                <div class="card mx-auto my-3" id="{{product.id}}" style="width: 18rem;">
+                    <img src="{{product.image.url}}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                    <h5 class="card-title"><b>{{product.name}}</b></h5>
+                    <p class="card-text"><b>₹ {{product.price}}</b></p>              
+                </div>
+                <div class="card-footer p-0">
+                    <div class="row no-gutters">
+                        <form action = "/cart" class="mx-auto" method = "POST">
+                            {% csrf_token %}
+                            <input hidden type = "text" class="" name = 'product' value = '{{product.id}}'>
+                            <input type = "submit" class="btn btn-light border" style="background-color:#48a7f5; color: white; text-align:center" value = "Move To Cart">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    
+        <br><hr><br>
+        {% if not request.session.adv_pay %}
+        <div class="m-2 p-3">
+            <h2>Cannot decide whether to buy it or not? Let's have a deal!</h2>
+            <a href="" data-toggle="modal" data-target="#deal" class = "btn btn-light btn-outline-info border rounded col-lg-4">Show the Deal</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!--modal-->
+
+<!-- Modal Checkout -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Check Out Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-2 p-2">
+                    <form action="/check-out" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="">Address</label>
+                            <input type="text" name="address" id="" class="form-control" placeholder="" aria-describedby="helpId">
+                        </div>
+                        <div class="form-group">
+                            <label for="">Phone</label>
+                            <input type="text" name="phone" id="" class="form-control" placeholder="" aria-describedby="helpId">
+                        </div>
+                        <div class="form-group">
+                            <label>Ammount Payable: </label>
+                            <label>₹ {{request.session.cart_price}}</label>
+                        </div>
+                            <input type="submit" class="btn float-right btn-outline-info col-lg-6"  value="Check Out">                            
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Modal Wallet -->
+<div class="modal fade" id="wallet" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Wallet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-2 p-2">
+                    <form action="wallet" method="GET">
+                        
+                        <div class="form-group">
+                            <label for="">Available Balance</label><br>
+                            <span>₹ {{request.session.balance}}</span><br>
+                            
+                        </div>
+                    </form>
+                    <form action="wallet" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="">Add Money</label><br>
+                            <p style="display: inline-block;">₹</p>
+                            <input type="number" name="addmoney" style="display: inline-block; width: 92%;" id="" class="form-control" placeholder="0.0" aria-describedby="helpId">
+                        </div>  
+                            <input type="submit" class="btn float-right btn-outline-info col-lg-6"  value="Add To Wallet">                     
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Deal -->
+
+<div class="modal fade" id="deal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Perfect Deal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-2 p-2">
+                    <div>
+                        <p>Pay just 20% amount of the total cart price and prevent them from going out of stock!</p>
+                    </div>
+                    <form action="deal" method="GET">
+                        <div class="form-group">
+                            <label>Total Cart Price: </label>
+                            <label>₹ {{request.session.cart_price}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label>Ammount you need to pay: </label>
+                            <label>₹ {{request.session.cart_price|multiply1}}</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="">Available Balance</label><br>
+                            <span>₹ {{request.session.balance}}</span><br>
+                        </div>
+                    </form>
+                    
+                    <form action="deal" method="POST">
+                        {% csrf_token %}
+                            <input type="submit" name="okdeal" class="btn float-right btn-outline-info col-lg-6"  value="₹ {{request.session.cart_price|multiply1}}">                     
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Modal Wallet -->
+<div class="modal fade" id="wallet" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Wallet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="m-2 p-2">
+                    <form action="wallet" method="GET">
+                        
+                        <div class="form-group">
+                            <label for="">Available Balance</label><br>
+                            <span>₹ {{request.session.balance}}</span><br>
+                            
+                        </div>
+                    </form>
+                    <form action="wallet" method="POST">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="">Add Money</label><br>
+                            <input type="number" name="addmoney" id="" class="form-control" placeholder="₹ 0.0" aria-describedby="helpId">
+                        </div>  
+                            <input type="submit" class="btn float-right btn-outline-info col-lg-6"  value="Add To Wallet">                     
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+{% endblock %}
