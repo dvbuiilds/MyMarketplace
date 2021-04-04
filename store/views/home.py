@@ -47,14 +47,14 @@ def order_essentials(request):
     c_orders = request.session.get('c_orders')
     c_date = request.session.get('date_time')
 
-    #Date ka Lafda........
+    #Date import........
     arr = []
     if c_date:
         for x in c_date:
             arr.append(datetime.fromisoformat(x))
         c_date = arr
     
-    #Order ka lafda,.......
+    #Order import ,.......
     if c_orders:
         temp_orders = Product.get_products_for_status(c_orders)
         return zip(temp_orders, c_date)

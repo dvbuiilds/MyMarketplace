@@ -36,7 +36,7 @@ class Cart(View):
         
         request.session['cart'] = cart
         return HttpResponseRedirect(request.path_info)
-  
+
 
 def cart_display(request):
     ids = list(request.session.get('cart').keys())
